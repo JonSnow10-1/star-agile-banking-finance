@@ -34,6 +34,24 @@ pipeline {
                                    }
                         }
                 }
+        stage('Push-Image') {
+           steps {
+               sh 'docker push ganesh36/banking-project-demo:1.0'
+                     }
+                }
+       stage('Config & Deployment') {
+            steps {
+                
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS-ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    dir('terraform-files') {
+                        sh 'sudo chmod 600 mykey.pem'
+                        sh 'terraform init'
+                        sh 'terraform validate'
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
        
 }
 }
